@@ -1,7 +1,7 @@
 window.onload = function() {
     if (localStorage.getItem("username")) {
         const username = localStorage.getItem("username");
-        console.log("LocalStorage Found Username: " + username);
+        console.log("LocalStorage Found Previous Username: " + username);
         const usernameInputField = document.querySelector('input[type="text"]');
         if (usernameInputField) {
             usernameInputField.value = username;
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             var error = document.getElementById("error");
 
             
-            console.log("Username:", username);
+            console.log("Current Username:", username);
             localStorage.setItem("username", username);
             
             if (!username) {
