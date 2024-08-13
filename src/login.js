@@ -25,17 +25,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const form = loginButton.closest('form');
             const username = form.querySelector('input[type="text"]').value;
             const password = form.querySelector('input[type="password"]').value;
+            var error = document.getElementById("error");
+
             
             console.log("Username:", username);
             localStorage.setItem("username", username);
             
             if (!username) {
                 console.log("Username field is blank.");
-                window.alert("Please add a username");
+                error.style.display = "block";
+                error.body.text = "ERROR: Please enter Username";
             } else {
             if (!password) {
                 console.log("Password field is blank.");
-                window.alert("Please add a password.");
+                error.style.display = "block";
+                error.body.text = "ERROR: Please enter Password";
             } else {
               window.alert("Authentication is not finished!");
             } 
