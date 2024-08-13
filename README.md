@@ -24,3 +24,5 @@ XPanel can be used to remotely control your servers using our state of the art c
 XPanel can also be used to impose Parental Controls on your PC's, blocking access to specific websites, disabling access to the computer during 'Downtime', and stopping malicious files from being run.
 
 ## How to Install XPanel 
+
+### Coming Soon!
