@@ -4,7 +4,7 @@ A Web Managed Panel, Mainly for server use however can be used for home desktop 
 
 # Checklist
 - [x] Login Screen
-- [/] Home Screen Kinda
+- [ ] Home Screen
 - [ ] Dashboard 
 
 # Urgent Features
