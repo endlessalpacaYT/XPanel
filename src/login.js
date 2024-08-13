@@ -34,12 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!username) {
                 console.log("Username field is blank.");
                 error.style.display = "block";
-                error.body.text = "ERROR: Please enter Username";
+                error.innerText = "ERROR: Please enter Username.";
             } else {
             if (!password) {
                 console.log("Password field is blank.");
                 error.style.display = "block";
-                error.body.text = "ERROR: Please enter Password";
+                error.innerText = "ERROR: Please enter Password.";
             } else {
               window.alert("Authentication is not finished!");
             } 
