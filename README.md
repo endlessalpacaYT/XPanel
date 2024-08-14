@@ -10,7 +10,7 @@ A Web Managed Administration Panel, for mainly Server Use, but can also be used 
 ## Urgent Features
 - [ ] Authentication On Login
 - [ ] A Dashboard
-- [ ] Backend
+- [ ] Backend (Partially done but extremely limited)
 - [ ] System Agent (for administration of computers)
 
 ## Use Cases
