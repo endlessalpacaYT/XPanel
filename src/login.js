@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 error.innerText = "ERROR: Please enter Password.";
             } else {
               window.alert("Authentication is not finished!");
+              window.location.href = "./pages/home/index.html"
             } 
             }
         });
