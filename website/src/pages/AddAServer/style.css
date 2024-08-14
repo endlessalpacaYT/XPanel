@@ -6,7 +6,7 @@ html, body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-#LoginForm {
+#ServerForm {
     max-width: 400px; 
     margin: 100px auto; 
     padding: 25px 50px; 
@@ -17,7 +17,7 @@ html, body {
 }
 
 @media (max-width: 600px) {
-    #LoginForm {
+    #ServerForm {
         max-width: 300px; 
         margin: auto; 
         padding: 15px 20px; 
@@ -28,16 +28,16 @@ html, body {
     }
 }
 
-#LoginForm h1 {
+#ServerForm h1 {
     margin-top: 0; 
 }
 
-#LoginForm label {
+#ServerForm label {
     display: block; 
     margin-top: 10px;
 }
 
-#LoginForm input {
+#ServerForm input {
     width: 100%; 
     padding: 10px;
     margin-top: 5px; 
@@ -48,11 +48,11 @@ html, body {
     transition: 0.8s;
 }
 
-#LoginForm input:focus {
+#ServerForm input:focus {
     background-color: black;
 }
 
-#LoginForm button {
+#ServerForm button {
     margin-top: 10px;
     padding: 10px;
     background-color: orange;
@@ -64,11 +64,11 @@ html, body {
     transition: 0.3s;
 }
 
-#LoginForm button:hover {
+#ServerForm button:hover {
     background-color: darkorange; 
 }
 
-#LoginForm error {
+#ServerForm error {
   padding: 20px;
   background-color: #f44336;
   color: white;

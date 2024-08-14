@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-app.use(express.static('website/src'));
+app.use(express.static(path.join(__dirname, 'website/src')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -25,8 +25,38 @@ const ServerSchema = new mongoose.Schema({
     userId: mongoose.Schema.Types.ObjectId
 });
 
+const LocalServerSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    url: { type: String, required: true, unique: true },
+    userId: { type: String, required: true }
+}, { collection: "servers" });
+
 const User = mongoose.model('User', UserSchema);
 const Server = mongoose.model('Server', ServerSchema);
+const LocalServer = mongoose.model("LocalServer", LocalServerSchema);
+
+async function addServerIfNoneExists(serverData) {
+    try {
+        let server = await LocalServer.findOne({ url: serverData.url });
+        if (!server) {
+            server = new LocalServer(serverData);
+            await server.save();
+            console.log('No Servers Was Found So Created One');
+        } else {
+            console.log('Atleast 1 Server Was Found');
+        }
+    } catch (error) {
+        console.error('Error handling server:', error.message);
+    }
+}
+
+const serverData = {
+    name: 'Local Server',
+    url: '127.0.0.1',
+    userId: '*'  //needs to automatically bind to every user since this is the main server.
+};
+
+addServerIfNoneExists(serverData);
 
 app.use(session({
     secret: 'xpanelv1',
@@ -73,6 +103,10 @@ app.get("/home", ( req, res ) => {
     res.sendFile(path.join( __dirname + "/website/src/pages/Home/index.html" ));
   });
 
+app.get("/addaserver", (req, res) => {
+    res.sendFile(path.join(__dirname, 'website/src/pages/AddAServer/index.html'));
+});
+
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
@@ -104,7 +138,7 @@ app.get('/api/servers', isAuthenticated, (req, res) => {
             res.json(servers);
         }
     });
-});
+}); 
 
 app.post('/api/servers', isAuthenticated, async (req, res) => {
     const { ip, code } = req.body;
