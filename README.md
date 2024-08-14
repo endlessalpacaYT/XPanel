@@ -1,6 +1,6 @@
 # XPanel
 A Web Managed Administration Panel, for mainly Server Use, but can also be used at Home.
-<img align="center" src="./Images/XPanel NoBackground.png" />
+<img align="center" src="./website/Images/XPanel NoBackground.png" />
 
 ## Checklist
 - [x] Login Screen
