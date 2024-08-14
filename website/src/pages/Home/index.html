@@ -16,31 +16,85 @@
             <img src="../../resources/Images/Logo/XPanel-NoBackground.png" alt="XPanel Logo">
         </div>
     </nav>
+    
     <h1>Your Servers:</h1>
     <div class="tiles-grid" id="Server-Selector">
-        <div data-size="medium" data-role="tile">
-            <span class="branding-bar">Server 1</span>
-            <img src="../../resources/Images/Icons/CloudServer.png" class="icon">
-        </div>
+
         <div data-size="medium" data-role="tile" id="addServerTile">
             <span class="branding-bar">Add A Server</span>
             <span class="mif-plus icon"></span>
         </div>
-        
     </div>
+    
     <br>
     <h1>Server Options:</h1>
     <div class="tiles-grid" id="ServerPanel">
         <div data-size="medium" data-role="tile" id="settingsTile">
             <span class="branding-bar">Settings</span>
-            <span class="mif-cog icon">
+            <span class="mif-cog icon"></span>
         </div>
         <div data-size="medium" data-role="tile" id="logOutTile">
             <span class="branding-bar">Log Out</span>
-            <span class="mif-exit icon">
+            <span class="mif-exit icon"></span>
         </div>
     </div>
-    <script src=".\home.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            fetch('/api/servers')
+                .then(response => response.json())
+                .then(servers => {
+                    const serverSelector = document.getElementById('Server-Selector');
+
+
+                    serverSelector.innerHTML = `
+                        <div data-size="medium" data-role="tile" id="addServerTile">
+                            <span class="branding-bar">Add A Server</span>
+                            <span class="mif-plus icon"></span>
+                        </div>
+                    `;
+
+                    servers.forEach(server => {
+                        const serverTile = document.createElement('div');
+                        serverTile.setAttribute('data-size', 'medium');
+                        serverTile.setAttribute('data-role', 'tile');
+                        serverTile.id = `server${server._id}Tile`;
+
+                        serverTile.innerHTML = `
+                            <span class="branding-bar">${server.name}</span>
+                            <img src="../../resources/Images/Icons/CloudServer.png" class="icon">
+                        `;
+
+                        serverTile.addEventListener('click', function() {
+                            window.location.href = `/servers/${server._id}`;
+                        });
+
+                        serverSelector.appendChild(serverTile);
+                    });
+
+                    document.getElementById("addServerTile").addEventListener("click", function() {
+                        window.location.href = '/add-server';
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching servers:', error);
+                    const serverSelector = document.getElementById('Server-Selector');
+                    serverSelector.innerHTML = '<p>Failed to load servers. Please try again later.</p>';
+                });
+
+
+            document.getElementById("settingsTile").addEventListener("click", function() {
+                alert("Settings clicked!");
+            });
+
+            document.getElementById("logOutTile").addEventListener("click", function() {
+                fetch('/logout')
+                    .then(() => window.location.href = '/')
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
     <script src="https://cdn.metroui.org.ua/current/metro.js"></script>
 </body>
 </html>
