@@ -41,7 +41,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 error.style.display = "block";
                 error.innerText = "ERROR: Please enter Password.";
             } else {
-              window.alert("Authentication is not finished!");
+              fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '/home';
+            } else {
+                return response.text().then(text => {
+                error.innerText = text;
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            error.innerText = 'An error occurred. Please try again.';
+        });
+    });
             } 
             }
         });
