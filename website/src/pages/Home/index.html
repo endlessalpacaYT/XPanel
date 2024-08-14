@@ -16,22 +16,31 @@
             <img src="../../resources/Images/Logo/XPanel-NoBackground.png" alt="XPanel Logo">
         </div>
     </nav>
+    <h1>Your Servers:</h1>
     <div class="tiles-grid" id="Server-Selector">
-        <div data-size="medium" data-role="tile">
-            <span class="branding-bar">Server Selector -></span>
-            <img src="../../resources/Images/Logo/XPanel-NoBackground.png" class="icon">
-        </div>
         <div data-size="medium" data-role="tile">
             <span class="branding-bar">Server 1</span>
             <img src="../../resources/Images/Icons/CloudServer.png" class="icon">
         </div>
+        <div data-size="medium" data-role="tile" id="addServerTile">
+            <span class="branding-bar">Add A Server</span>
+            <span class="mif-plus icon"></span>
+        </div>
+        
     </div>
+    <br>
+    <h1>Server Options:</h1>
     <div class="tiles-grid" id="ServerPanel">
-        <div data-size="wide" data-role="tile">
-            <span class="branding-bar">DashBoard</span>
-            <img src="../../resources/Images/Icons/DashBoard.png" class="icon">
+        <div data-size="medium" data-role="tile" id="settingsTile">
+            <span class="branding-bar">Settings</span>
+            <span class="mif-cog icon">
+        </div>
+        <div data-size="medium" data-role="tile" id="logOutTile">
+            <span class="branding-bar">Log Out</span>
+            <span class="mif-exit icon">
         </div>
     </div>
+    <script src=".\home.js"></script>
     <script src="https://cdn.metroui.org.ua/current/metro.js"></script>
 </body>
 </html>
