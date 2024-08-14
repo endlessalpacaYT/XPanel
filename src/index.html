@@ -6,42 +6,28 @@
     <link rel="stylesheet" href="resources/stylesheets/style.css">
     <link rel="stylesheet" href="./resources/stylesheets/navbar/navbar.css">
     <link rel="stylesheet" href="./style.css">
-    <title>Login | XPanel</title>
-    <style>
-    .error {
-      padding: 20px;
-      border-radius: 25px;
-      background-color: #f44336;
-      color: white;
-      text-align: center;
-      place-content: start;
-      display: block;
-      bottom: 0px;
-    }
-</style>
+    <title>Login | Xpanel</title>
 </head>
 <body>
     <nav id="NavContainer">
         <div id="NavBar">
-            <h1>XPanel - Login</h1>
-            <img src="./resources/Images/Logo/XPanel NoBackground.png" alt="XPanel Logo">
+            <h1>XPanel - Logon</h1>
+            <img src="./resources/Images/Logo/XPanel-NoBackground.png" alt="XPanel Logo">
         </div>
     </nav>
     <main>
-
         <div id="LoginForm">
             <form>
-                <div class="error" id="error" style="display: none;"></div>
-                <h1 style="text-align: center;">Welcome To XPanel</h1>
-                <p style="text-align: center;">Please Enter Your User Credentials</p>
+                <h1>Welcome To XPanel</h1>
+                <p>Please Enter Your User Credentials</p>
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password">
-                <button id="LoginButton" type="submit">Login</button>
+                <button type="submit" id="LoginButton">Login</button>
             </form>
         </div>
+        <script src="./LoginAuth/script.js"></script>
     </main>
-    <script src="./login.js"></script>
 </body>
 </html>
