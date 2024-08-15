@@ -58,11 +58,7 @@ if (confirmButton) {
     console.error("Confirm button not found.");
 }
 
-displayNameValue = localStorage.getItem("displayName");
-ipValue = localStorage.getItem("ip");
-codeValue = localStorage.getItem("code");
 
-console.log("The Last Entered Credentials: " + displayNameValue + " " + ipValue + " " + codeValue);
 
 if (confirmButton) {
     confirmButton.addEventListener("click", async (event) => {
@@ -73,9 +69,6 @@ if (confirmButton) {
         const ip = form.querySelector('input[name="ip"]').value
         const code = form.querySelector('input[name="code"]').value
 
-        localStorage.setItem("displayName", displayName);
-        localStorage.setItem("ip", ip);
-        localStorage.setItem("code", code);
     
         fetch("http://127.0.0.1:3551/api/servers", {
             method: "POST",
