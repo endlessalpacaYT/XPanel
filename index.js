@@ -19,6 +19,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const PORT = process.env.PORT || 3551;
+const DRIVE_PATH = process.env.DRIVE_PATH || 'C:/';
+const DB_PATH = process.env.DB_PATH || 'mongodb://localhost/xpanel';
 
 const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
@@ -271,7 +273,7 @@ app.get('/api/servers/:serverId/metrics', isAuthenticated, async (req, res) => {
     });
 });
 
-const DRIVE_PATH = process.env.DRIVE_PATH || 'C:/';
+
 
 app.get('/api/serverstats/system-stats', async (req, res) => {
     try {
