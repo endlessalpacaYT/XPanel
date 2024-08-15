@@ -3,41 +3,44 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const path = require('path');
 const axios = require('axios');
+const bcrypt = require('bcrypt');
 const session = require('express-session');
 const bodyParser = require('body-parser');
-const os = require("os"); //am i really the only one that uses double quotes? yes
+const os = require("os");
 const checkDiskSpace = require('check-disk-space').default;
+const { v4: uuidv4 } = require('uuid');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
 app.use(express.static(path.join(__dirname, 'website/src')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const PORT = process.env.PORT || 3551;
 
 const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    userId: { type: String, required: true }
+    userId: { type: String, required: true, unique: true }
 }, { collection: "users" });
 
 const ServerSchema = new mongoose.Schema({
-    name: String,
-    url: String,
-    userId: mongoose.Schema.Types.ObjectId
-}, { collection: "servers"}); 
-
-const LocalServerSchema = new mongoose.Schema({
     name: { type: String, required: true },
     url: { type: String, required: true, unique: true },
     userId: { type: String, required: true }
 }, { collection: "servers" });
 
+const LocalServerSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    url: { type: String, required: true, unique: true },
+    userId: [{ type: String, required: true }]
+}, { collection: "servers" });
+
 const User = mongoose.model('User', UserSchema);
 const Server = mongoose.model('Server', ServerSchema);
 const LocalServer = mongoose.model("LocalServer", LocalServerSchema);
-
 
 async function addServerIfNoneExists(serverData) {
     try {
@@ -45,32 +48,42 @@ async function addServerIfNoneExists(serverData) {
         if (!server) {
             server = new LocalServer(serverData);
             await server.save();
-            console.log('No Servers Was Found So Created One');
+            console.log('No server was found, so one was created.');
         } else {
-            console.log('Atleast 1 Server Was Found');
+            console.log('At least one server was found.');
         }
     } catch (error) {
         console.error('Error handling server:', error.message);
     }
 }
 
-const userIDArray = [];
-
-
-const serverData = {
-    name: 'Local Server',
-    url: '127.0.0.1',
-    userId: userIDArray  //needs to automatically bind to every user since this is the main server.
-}; 
-
-addServerIfNoneExists(serverData);
-
-async function getCPUCores() {  // For The DashBoard
-    const cpuCount = os.cpus().length;
-    return cpuCount; 
+async function getAllUserIds() {
+    try {
+        const users = await User.find({}, 'userId').exec();
+        const userIds = users.map(user => user.userId);
+        return userIds;
+    } catch (error) {
+        console.error('Error fetching user IDs:', error.message);
+        return [];
+    }
 }
 
+(async () => {
+    const userIDArray = await getAllUserIds();
 
+    const serverData = {
+        name: 'Local Server',
+        url: '127.0.0.1',
+        userId: userIDArray
+    };
+
+    addServerIfNoneExists(serverData);
+})();
+
+async function getCPUCores() {
+    const cpuCount = os.cpus().length;
+    return cpuCount;
+}
 
 app.use(session({
     secret: 'xpanelv1',
@@ -79,7 +92,7 @@ app.use(session({
 }));
 
 const isAuthenticated = (req, res, next) => {
-    if (req.session.userId) {
+    if (req.session.userId || req.cookies.userId) {
         next();
     } else {
         res.redirect('/');
@@ -88,8 +101,7 @@ const isAuthenticated = (req, res, next) => {
 
 async function connectDB() {
     try {
-        await mongoose.connect("mongodb://localhost/xpanel", {
-        });
+        await mongoose.connect("mongodb://localhost/xpanel");
         const testDB = mongoose.model('connectionTest', { successful: String });
         const testDocument = new testDB({ successful: 'Yes' });
         await testDocument.save();
@@ -106,54 +118,99 @@ app.listen(PORT, () => {
     getCPUCores();
 });
 
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname + "/website/src/index.html"));
+});
 
-
-app.get("/", ( req, res ) => {
-    res.sendFile(path.join( __dirname + "/website/src/index.html" ));
-    res.sendFile(path.join( __dirname + "/website/src/style.css" ));
-    res.sendFile(path.join( __dirname + "/website/src/loginScript/login.js" ));
-  });
-
-app.get("/home", ( req, res ) => {
-    res.sendFile(path.join( __dirname + "/website/src/pages/Home/index.html" ));
-  });
+app.get("/home", (req, res) => {
+    res.sendFile(path.join(__dirname + "/website/src/pages/Home/index.html"));
+});
 
 app.get("/addaserver", (req, res) => {
-    res.sendFile(path.join(__dirname, 'website/src/pages/AddAServer/index.html'));
+    res.sendFile(path.join(__dirname, '/website/src/pages/AddAServer/index.html'));
 });
 
-app.post('/login', (req, res) => {
+app.get("/server/dashboard", (req, res) => {
+    res.sendFile(path.join(__dirname + "/website/src/pages/Dashboard/index.html"));
+});
+
+app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
 
-    User.findOne({ username }, (err, user) => {
-        if (err) {
-            console.error(err.message);
-            res.status(500).send('Internal server error');
-        } else if (user && bcrypt.compareSync(password, user.password)) {
-            req.session.userId = user._id;
-            res.redirect('/home');
-        } else {
-            res.status(401).send('Invalid credentials');
+    try {
+        if (!username || !password) {
+            return res.status(400).json({ success: false, message: 'Username and Password are required.' });
         }
-    });
+
+        const user = await User.findOne({ username });
+
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'Invalid Username or Password.' });
+        }
+
+        const match = await bcrypt.compare(password, user.password);
+
+        if (match) {
+            req.session.userId = user._id;
+            res.cookie('userId', user._id.toString(), { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+            res.json({ success: true, message: 'Login successful' });
+        } else {
+            res.status(401).json({ success: false, message: 'Invalid Username or Password.' });
+        }
+    } catch (error) {
+        console.error('Error during login:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error.' });
+    }
 });
 
-app.get('/logout', (req, res) => {
+app.post('/api/add-user', async (req, res) => {
+    try {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+        const newUser = new User({
+            username: req.body.username,
+            password: hashedPassword,
+            userId: uuidv4()
+        });
+
+        await newUser.save();
+        res.status(200).json({ status: "Account created successfully" });
+    } catch (error) {
+        if (error.code === 11000) {
+            res.status(400).json({ message: 'Username already exists' });
+        } else {
+            res.status(400).json({ message: error.message });
+        }
+    }
+});
+
+app.get('/api/logout', (req, res) => {
     req.session.destroy(() => {
         res.redirect('/');
     });
 });
 
-app.get('/api/servers', isAuthenticated, (req, res) => {
-    Server.find({ userId: req.session.userId }, (err, servers) => {
-        if (err) {
-            console.error(err.message);
-            res.status(500).send('Internal server error');
-        } else {
-            res.json(servers);
+app.get('/api/servers', isAuthenticated, async (req, res) => {
+    try {
+        const userIdFromCookie = req.cookies.userId;
+
+        if (!userIdFromCookie) {
+            return res.status(400).json({ success: false, message: 'User ID not provided' });
         }
-    });
-}); 
+
+        const servers = await Server.find({ userId: userIdFromCookie }).exec();
+
+        if (!servers) {
+            return res.status(404).json({ success: false, message: 'No servers found' });
+        }
+
+        res.json(servers);
+    } catch (err) {
+        console.error('Error fetching servers:', err.message);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
 
 app.post('/api/servers', isAuthenticated, async (req, res) => {
     const { ip, code } = req.body;
@@ -168,14 +225,8 @@ app.post('/api/servers', isAuthenticated, async (req, res) => {
                     userId: req.session.userId
                 });
 
-                newServer.save(err => {
-                    if (err) {
-                        console.error(err.message);
-                        res.status(500).send('Internal server error');
-                    } else {
-                        res.status(201).json({ message: 'Server added successfully!' });
-                    }
-                });
+                await newServer.save();
+                res.status(201).json({ message: 'Server added successfully!' });
             } else {
                 res.status(400).json({ message: 'Invalid code or server not reachable!' });
             }
@@ -219,8 +270,6 @@ app.get('/api/servers/:serverId/metrics', isAuthenticated, async (req, res) => {
         }
     });
 });
-
-
 
 const DRIVE_PATH = process.env.DRIVE_PATH || 'C:/';
 

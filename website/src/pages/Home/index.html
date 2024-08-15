@@ -33,6 +33,10 @@
             <span class="branding-bar">Settings</span>
             <span class="mif-cog icon"></span>
         </div>
+        <div data-size="medium" data-role="tile" id="dashboardTile">
+            <span class="branding-bar">Dashboard</span>
+            <span class="mif-windows icon"></span>
+        </div>
         <div data-size="medium" data-role="tile" id="logOutTile">
             <span class="branding-bar">Log Out</span>
             <span class="mif-exit icon"></span>
@@ -41,59 +45,85 @@
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
 
-            fetch('/api/servers')
-                .then(response => response.json())
-                .then(servers => {
-                    const serverSelector = document.getElementById('Server-Selector');
+    const userId = getCookie('userId');
 
+    fetch('/api/servers', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userId}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!Array.isArray(data)) {
+            throw new Error('Expected an array but got something else');
+        }
 
-                    serverSelector.innerHTML = `
-                        <div data-size="medium" data-role="tile" id="addServerTile">
-                            <span class="branding-bar">Add A Server</span>
-                            <span class="mif-plus icon"></span>
-                        </div>
-                    `;
+        const serverSelector = document.getElementById('Server-Selector');
 
-                    servers.forEach(server => {
-                        const serverTile = document.createElement('div');
-                        serverTile.setAttribute('data-size', 'medium');
-                        serverTile.setAttribute('data-role', 'tile');
-                        serverTile.id = `server${server._id}Tile`;
+        serverSelector.innerHTML = `
+            <div data-size="medium" data-role="tile" id="addServerTile">
+                <span class="branding-bar">Add A Server</span>
+                <span class="mif-plus icon"></span>
+            </div>
+        `;
 
-                        serverTile.innerHTML = `
-                            <span class="branding-bar">${server.name}</span>
-                            <img src="../../resources/Images/Icons/CloudServer.png" class="icon">
-                        `;
+        data.forEach(server => {
+            const serverTile = document.createElement('div');
+            serverTile.setAttribute('data-size', 'medium');
+            serverTile.setAttribute('data-role', 'tile');
+            serverTile.id = `server${server._id}Tile`;
 
-                        serverTile.addEventListener('click', function() {
-                            window.location.href = `/servers/${server._id}`;
-                        });
+            serverTile.innerHTML = `
+                <span class="branding-bar">${server.name}</span>
+                <img src="../../resources/Images/Icons/CloudServer.png" class="icon">
+            `;
 
-                        serverSelector.appendChild(serverTile);
-                    });
-
-                    document.getElementById("addServerTile").addEventListener("click", function() {
-                        window.location.href = '/add-server';
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching servers:', error);
-                    const serverSelector = document.getElementById('Server-Selector');
-                    serverSelector.innerHTML = '<p>Failed to load servers. Please try again later.</p>';
-                });
-
-
-            document.getElementById("settingsTile").addEventListener("click", function() {
-                alert("Settings clicked!");
+            serverTile.addEventListener('click', function() {
+                window.location.href = `/servers/${server._id}`;
             });
 
-            document.getElementById("logOutTile").addEventListener("click", function() {
-                fetch('/logout')
-                    .then(() => window.location.href = '/')
-                    .catch(error => console.error('Error:', error));
-            });
+            serverSelector.appendChild(serverTile);
         });
+
+        document.getElementById("addServerTile").addEventListener("click", function() {
+            window.location.href = '/addaserver';
+        });
+    })
+    .catch(error => {
+        console.error('Error fetching servers:', error);
+        const serverSelector = document.getElementById('Server-Selector');
+        serverSelector.innerHTML = '<p>Failed to load servers. Please try again later.</p>';
+    });
+
+    document.getElementById("dashboardTile").addEventListener("click", function() {
+        window.location.href = "/server/dashboard";
+    });
+
+    document.getElementById("settingsTile").addEventListener("click", function() {
+        alert("Settings clicked!");
+    });
+
+    document.getElementById("logOutTile").addEventListener("click", function() {
+        fetch('/api/logout')
+            .then(() => window.location.href = '/')
+            .catch(error => console.error('Error:', error));
+    });
+});
+
+
     </script>
     <script src="https://cdn.metroui.org.ua/current/metro.js"></script>
 </body>

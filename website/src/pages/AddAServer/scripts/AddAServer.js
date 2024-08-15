@@ -70,7 +70,7 @@ if (confirmButton) {
         const code = form.querySelector('input[name="code"]').value
 
     
-        fetch("http://127.0.0.1:3551/api/servers", {
+        fetch("/api/servers", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',

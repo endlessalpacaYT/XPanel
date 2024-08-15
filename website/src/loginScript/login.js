@@ -5,8 +5,6 @@ window.onload = function() {
         const usernameInputField = document.querySelector('input[type="text"]');
         if (usernameInputField) {
             usernameInputField.value = username;
-            const welcomeBackElement = document.createElement("p");
-            usernameInputField.parentNode.insertBefore(welcomeBackElement, usernameInputField.nextSibling);
         } else {
             console.log("Username input field not found.");
         }
@@ -25,9 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const form = loginButton.closest('form');
             const username = form.querySelector('input[type="text"]').value;
             const password = form.querySelector('input[type="password"]').value;
-            var error = document.getElementById("error");
+            const error = document.getElementById("error");
 
-            
             console.log("Current Username:", username);
             localStorage.setItem("username", username);
             
@@ -35,14 +32,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("Username field is blank.");
                 error.style.display = "block";
                 error.innerText = "ERROR: Please enter Username.";
-            } else {
-            if (!password) {
+            } else if (!password) {
                 console.log("Password field is blank.");
                 error.style.display = "block";
                 error.innerText = "ERROR: Please enter Password.";
             } else {
-                window.location.href = '/home';
-            } 
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            window.location.href = '/home'; // Redirect to home if login is successful
+                        } else {
+                            error.style.display = "block";
+                            error.innerText = data.message || "ERROR: Login failed.";
+                        }
+                    } else {
+                        error.style.display = "block";
+                        error.innerText = "ERROR: Login failed. Please try again.";
+                    }
+                } catch (error) {
+                    console.error('Error during fetch:', error);
+                    error.style.display = "block";
+                    error.innerText = "ERROR: Network error. Please try again.";
+                }
             }
         });
     } else {
