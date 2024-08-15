@@ -5,6 +5,8 @@ const path = require('path');
 const axios = require('axios');
 const session = require('express-session');
 const bodyParser = require('body-parser');
+const os = require("os"); //am i really the only one that uses double quotes? yes
+const checkDiskSpace = require('check-disk-space').default;
 
 const app = express();
 
@@ -15,15 +17,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3551;
 
 const UserSchema = new mongoose.Schema({
-    username: String,
-    password: String
-});
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    userId: { type: String, required: true }
+}, { collection: "users" });
 
 const ServerSchema = new mongoose.Schema({
     name: String,
     url: String,
     userId: mongoose.Schema.Types.ObjectId
-});
+}, { collection: "servers"}); 
 
 const LocalServerSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -34,6 +37,7 @@ const LocalServerSchema = new mongoose.Schema({
 const User = mongoose.model('User', UserSchema);
 const Server = mongoose.model('Server', ServerSchema);
 const LocalServer = mongoose.model("LocalServer", LocalServerSchema);
+
 
 async function addServerIfNoneExists(serverData) {
     try {
@@ -50,13 +54,23 @@ async function addServerIfNoneExists(serverData) {
     }
 }
 
+const userIDArray = [];
+
+
 const serverData = {
     name: 'Local Server',
     url: '127.0.0.1',
-    userId: '*'  //needs to automatically bind to every user since this is the main server.
-};
+    userId: userIDArray  //needs to automatically bind to every user since this is the main server.
+}; 
 
 addServerIfNoneExists(serverData);
+
+async function getCPUCores() {  // For The DashBoard
+    const cpuCount = os.cpus().length;
+    return cpuCount; 
+}
+
+
 
 app.use(session({
     secret: 'xpanelv1',
@@ -89,6 +103,7 @@ async function connectDB() {
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
     connectDB();
+    getCPUCores();
 });
 
 
@@ -203,4 +218,68 @@ app.get('/api/servers/:serverId/metrics', isAuthenticated, async (req, res) => {
             res.status(500).send('Could not fetch server metrics');
         }
     });
+});
+
+
+
+const DRIVE_PATH = process.env.DRIVE_PATH || 'C:/';
+
+app.get('/api/serverstats/system-stats', async (req, res) => {
+    try {
+        const startTime = Date.now();
+        const startCpuInfo = os.cpus();
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const endTime = Date.now();
+        const endCpuInfo = os.cpus();
+        const elapsedMs = endTime - startTime;
+
+        let idleMs = 0;
+        let totalMs = 0;
+
+        for (let i = 0; i < startCpuInfo.length; i++) {
+            const startCpu = startCpuInfo[i].times;
+            const endCpu = endCpuInfo[i].times;
+
+            const idleTime = endCpu.idle - startCpu.idle;
+            const totalTime = (endCpu.user + endCpu.nice + endCpu.sys + endCpu.irq + endCpu.idle) -
+                              (startCpu.user + startCpu.nice + startCpu.sys + startCpu.irq + startCpu.idle);
+
+            idleMs += idleTime;
+            totalMs += totalTime;
+        }
+
+        const cpuUsage = ((totalMs - idleMs) / totalMs) * 100;
+
+        const totalMem = os.totalmem();
+        const freeMem = os.freemem();
+        const usedMem = totalMem - freeMem;
+        const memUsage = (usedMem / totalMem) * 100;
+
+        const diskSpace = await checkDiskSpace(DRIVE_PATH);
+        const { free: freeDisk, size: totalDisk } = diskSpace;
+        const usedDisk = totalDisk - freeDisk;
+        const diskUsage = (usedDisk / totalDisk) * 100;
+
+        res.json({
+            cpu: {
+                cores: os.cpus().length,
+                usage: cpuUsage.toFixed(2) + '%'
+            },
+            ram: {
+                total: (totalMem / (1024 ** 3)).toFixed(2) + ' GB',
+                used: (usedMem / (1024 ** 3)).toFixed(2) + ' GB',
+                usage: memUsage.toFixed(2) + '%'
+            },
+            storage: {
+                total: (totalDisk / (1024 ** 3)).toFixed(2) + ' GB',
+                used: (usedDisk / (1024 ** 3)).toFixed(2) + ' GB',
+                usage: diskUsage.toFixed(2) + '%'
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching system stats:', error.message);
+        res.status(500).send('Could not fetch system stats');
+    }
 });
