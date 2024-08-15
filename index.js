@@ -103,7 +103,7 @@ const isAuthenticated = (req, res, next) => {
 
 async function connectDB() {
     try {
-        await mongoose.connect("mongodb://localhost/xpanel");
+        await mongoose.connect(DB_PATH);
         const testDB = mongoose.model('connectionTest', { successful: String });
         const testDocument = new testDB({ successful: 'Yes' });
         await testDocument.save();
