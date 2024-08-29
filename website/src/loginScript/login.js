@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (response.ok) {
                         const data = await response.json();
                         if (data.success) {
-                            window.location.href = '/home'; // Redirect to home if login is successful
+                            window.location.href = '/home';
                         } else {
                             error.style.display = "block";
                             error.innerText = data.message || "ERROR: Login failed.";
