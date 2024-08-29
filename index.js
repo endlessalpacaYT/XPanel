@@ -20,7 +20,7 @@ app.use(cookieParser());
 
 const PORT = process.env.PORT || 3551;
 const DRIVE_PATH = process.env.DRIVE_PATH || 'C:/';
-const DB_PATH = process.env.DB_PATH || 'mongodb://localhost/xpanel';
+const DB_PATH = process.env.DB_URL || 'mongodb://localhost/xpanel';
 
 const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
