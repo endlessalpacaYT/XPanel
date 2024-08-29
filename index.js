@@ -44,7 +44,7 @@ const User = mongoose.model('User', UserSchema);
 const Server = mongoose.model('Server', ServerSchema);
 const LocalServer = mongoose.model("LocalServer", LocalServerSchema);
 
-async function addServerIfNoneExists(serverData) {
+async function localServer(serverData) {
     try {
         let server = await LocalServer.findOne({ url: serverData.url });
         if (!server) {
@@ -52,7 +52,13 @@ async function addServerIfNoneExists(serverData) {
             await server.save();
             console.log('No server was found, so one was created.');
         } else {
-            console.log('At least one server was found.');
+        server.deleteOne({ name: "Local Server" }).then((result) => { 
+            console.log('Removed Local Server for ID refresh');
+                });
+            server = new LocalServer(serverData);
+            await server.save();
+            console.log('Refreshed server for new user ID's.');
+                
         }
     } catch (error) {
         console.error('Error handling server:', error.message);
@@ -79,7 +85,7 @@ async function getAllUserIds() {
         userId: userIDArray
     };
 
-    addServerIfNoneExists(serverData);
+    localServer(serverData);
 })();
 
 async function getCPUCores() {
@@ -128,6 +134,7 @@ app.get("/home", (req, res) => {
     res.sendFile(path.join(__dirname + "/website/src/pages/Home/index.html"));
 });
 
+
 app.get("/addaserver", (req, res) => {
     res.sendFile(path.join(__dirname, '/website/src/pages/AddAServer/index.html'));
 });
@@ -164,6 +171,8 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal Server Error.' });
     }
 });
+
+
 
 app.post('/api/add-user', async (req, res) => {
     try {
@@ -219,11 +228,11 @@ app.post('/api/servers', isAuthenticated, async (req, res) => {
 
     if (ip && code) {
         try {
-            const response = await axios.get(`http://${ip}:4000/validate/${code}`);
+            const response = await axios.get(`http://${ip}:5000/validate/${code}`);
             if (response.status === 200 && response.data.valid) {
                 const newServer = new Server({
                     name: response.data.name,
-                    url: `http://${ip}:4000`,
+                    url: `http://${ip}:5000`,
                     userId: req.session.userId
                 });
 
