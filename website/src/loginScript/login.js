@@ -37,11 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 error.style.display = "block";
                 error.innerText = "ERROR: Please enter Password.";
             } else {
-<<<<<<< HEAD:src/login.js
-              window.alert("Authentication is not finished!");
-              window.location.href = "./pages/home/index.html";
-            } 
-=======
+
                 try {
                     const response = await fetch('/api/login', {
                         method: 'POST',
@@ -68,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     error.style.display = "block";
                     error.innerText = "ERROR: Network error. Please try again.";
                 }
->>>>>>> optixyt0-patch-1:website/src/loginScript/login.js
             }
         });
     } else {

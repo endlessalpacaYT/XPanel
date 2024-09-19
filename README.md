@@ -1,10 +1,7 @@
 # XPanel
 A Web Managed Administration Panel, for mainly Server Use, but can also be used at Home.
-<<<<<<< HEAD
-<img align="center" src="./Images/XPanel-NoBackground.png" />
-=======
 <img align="center" src="./website/Images/XPanel-NoBackground.png" />
->>>>>>> optixyt0-patch-1
+
 
 ## Features
 ### Home Screen
@@ -33,4 +30,7 @@ XPanel also offers features suitable for home use, such as parental controls. Se
 
 ## How to Install XPanel 
 
-### Coming Soon!
+
+1. Firstly run ||npm i||, which will download all of the packages required for launching the XPanel Server Interface.
+2. Next, please download the XPanel Administration Client from https://xpanel.optixyt.uk/Installer.exe (coming soon).
+3. Open up a browser window, and head to http://localhost:3551 to get started. Basic Login Details are the username admin and the password XPanel.
