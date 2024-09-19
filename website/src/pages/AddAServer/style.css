@@ -1,0 +1,80 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#ServerForm {
+    max-width: 400px; 
+    margin: 100px auto;
+    padding: 25px 50px;  
+}
+
+@media (max-width: 600px) {
+    #ServerForm {
+        max-width: 300px;
+        margin: 100px auto;
+        padding: 15px 20px; 
+    }
+}
+
+#ServerForm h1 {
+    margin-top: 0; 
+    font-weight: 300;
+}
+
+#ServerForm p {
+    font-weight: 300;
+}
+
+#ServerForm label {
+    display: block; 
+    margin-top: 10px;
+    font-weight: 300;
+}
+
+#ServerForm input {
+    width: 100%; 
+    padding: 10px;
+    margin-top: 5px; 
+    border: 1px solid gray;
+    border-radius: 5px;
+    background-color: #333; 
+    color: white; 
+    transition: 0.8s;
+}
+
+#ServerForm input:focus {
+    background-color: black;
+}
+
+#ServerForm button {
+    margin-top: 10px;
+    width: 80%;
+    padding: 10px;
+    margin-top: 20px;
+    margin-left: 10%;
+    margin-right: 10%;
+    background-color: orange;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    font-weight: 300;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#ServerForm button:hover {
+    background-color: darkorange; 
+}
+
+#ServerForm error {
+  padding: 20px;
+  background-color: #f44336;
+  color: white;
+  place-content: start;
+  display: block;
+  bottom: 0px;
+}

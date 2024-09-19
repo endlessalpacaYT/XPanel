@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../resources/stylesheets/style.css">
+    <link rel="stylesheet" href="../../resources/stylesheets/navbar/navbar.css">
+    <link rel="stylesheet" href="https://cdn.metroui.org.ua/current/metro.css">
+    <link rel="stylesheet" href="https://cdn.metroui.org.ua/current/icons.css">
+    <title>Home | XPanel</title>
+</head>
+<body>
+    <nav id="NavContainer">
+        <div id="NavBar">
+            <h1>XPanel - Home</h1>
+            <img src="../../resources/Images/Logo/XPanel-NoBackground.png" alt="XPanel Logo">
+        </div>
+    </nav>
+    
+    <h1>Your Servers:</h1>
+    <div class="tiles-grid" id="Server-Selector">
+
+        <div data-size="medium" data-role="tile" id="addServerTile">
+            <span class="branding-bar">Add A Server</span>
+            <span class="mif-plus icon"></span>
+        </div>
+    </div>
+    
+    <br>
+    <h1>Server Options:</h1>
+    <div class="tiles-grid" id="ServerPanel">
+        <div data-size="medium" data-role="tile" id="settingsTile">
+            <span class="branding-bar">Settings</span>
+            <span class="mif-cog icon"></span>
+        </div>
+        <div data-size="medium" data-role="tile" id="dashboardTile">
+            <span class="branding-bar">Dashboard</span>
+            <span class="mif-windows icon"></span>
+        </div>
+        <div data-size="medium" data-role="tile" id="logOutTile">
+            <span class="branding-bar">Log Out</span>
+            <span class="mif-exit icon"></span>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    const userId = getCookie('userId');
+
+    fetch('/api/servers', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userId}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!Array.isArray(data)) {
+            throw new Error('Expected an array but got something else');
+        }
+
+        const serverSelector = document.getElementById('Server-Selector');
+
+        serverSelector.innerHTML = `
+            <div data-size="medium" data-role="tile" id="addServerTile">
+                <span class="branding-bar">Add A Server</span>
+                <span class="mif-plus icon"></span>
+            </div>
+        `;
+
+        data.forEach(server => {
+            const serverTile = document.createElement('div');
+            serverTile.setAttribute('data-size', 'medium');
+            serverTile.setAttribute('data-role', 'tile');
+            serverTile.id = `server${server._id}Tile`;
+
+            serverTile.innerHTML = `
+                <span class="branding-bar">${server.name}</span>
+                <img src="../../resources/Images/Icons/CloudServer.png" class="icon">
+            `;
+
+            serverTile.addEventListener('click', function() {
+                window.location.href = `/servers/${server._id}`;
+            });
+
+            serverSelector.appendChild(serverTile);
+        });
+
+        document.getElementById("addServerTile").addEventListener("click", function() {
+            window.location.href = '/addaserver';
+        });
+    })
+    .catch(error => {
+        console.error('Error fetching servers:', error);
+        const serverSelector = document.getElementById('Server-Selector');
+        serverSelector.innerHTML = '<p>Failed to load servers. Please try again later.</p>';
+    });
+
+    document.getElementById("dashboardTile").addEventListener("click", function() {
+        window.location.href = "/server/dashboard";
+    });
+
+    document.getElementById("settingsTile").addEventListener("click", function() {
+        alert("Settings clicked!");
+    });
+
+    document.getElementById("logOutTile").addEventListener("click", function() {
+        fetch('/api/logout')
+            .then(() => window.location.href = '/')
+            .catch(error => console.error('Error:', error));
+    });
+});
+
+
+    </script>
+    <script src="https://cdn.metroui.org.ua/current/metro.js"></script>
+</body>
+</html>

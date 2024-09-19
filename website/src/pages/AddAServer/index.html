@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../resources/stylesheets/style.css">
+    <link rel="stylesheet" href="../../resources/stylesheets/navbar/navbar.css">
+    <link rel="stylesheet" href="/pages/AddAServer/style.css">
+    <title>Add A Server | XPanel</title>
+    <style>
+    .error {
+      padding: 20px;
+      border-radius: 25px;
+      background-color: #f44336;
+      color: white;
+      text-align: center;
+      place-content: start;
+      display: block;
+      bottom: 0px;
+    }
+</style>
+</head>
+<body>
+    <nav id="NavContainer">
+        <div id="NavBar">
+            <h1>XPanel - Add A Server</h1>
+            <img src="../../resources/Images/Logo/XPanel-NoBackground.png" alt="XPanel Logo">
+        </div>
+    </nav>
+    <main>
+        <div id="ServerForm">
+            <form>
+                <div class="error" id="error" style="display: none;"></div>
+                <h1 style="text-align: center;">Add A Server</h1>
+                <p style="text-align: center;">Please enter your Server Information below:</p>
+                <label for="displayName">Display Name</label>
+                <input type="text" id="displayName" name="displayName">
+                <label for="ip">IP</label>
+                <input type="text" id="ip" name="ip">
+                <label for="code">Code</label>
+                <input type="text" id="code" name="code">
+                <button id="ConfirmButton" type="submit">Confirm</button>
+            </form>
+        </div>
+    </main>
+    <script src="/pages/AddAServer/scripts/AddAServer.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "name": "xpanel-backend",
+  "version": "0.0.1",
+  "description": "XPanel Backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/endlessalpacaYT/XPanel.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/endlessalpacaYT/XPanel/issues"
+  },
+  "homepage": "https://github.com/endlessalpacaYT/XPanel#readme",
+  "dependencies": {
+    "axios": "^1.7.4",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "check-disk-space": "^3.4.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "mongoose": "^8.5.3",
+    "path": "^0.12.7",
+    "uuid": "^10.0.0"
+  }
+}
